@@ -673,26 +673,38 @@
       aktifkanItemSidebar(key);
     }
 
-    function bukaPopupWilayah(layer) {
+    function buatSlugWilayah(namaWilayah) {
+  return namaWilayah
+    .toLowerCase()
+    .replace("kabupaten ", "")
+    .replace("kota ", "")
+    .trim()
+    .replace(/\s+/g, "_");
+}
+
+function bukaPopupWilayah(layer) {
   pilihWilayah(layer);
 
   var namaWilayah = ambilNamaWilayah(layer.feature);
   var key = kunciWilayah(namaWilayah);
   var jumlahPenduduk = dataPendudukKey[key] || 0;
 
-  // buat nama file HTML otomatis (misal Sumedang -> sumedang.html)
-  var fileHTML = "kabupaten/" + key.toLowerCase().replace(/\s/g, "_") + ".html";
+  // Hasil contoh:
+  // Kabupaten Sumedang -> kabupaten/sumedang.html
+  // Kota Bandung -> kabupaten/bandung.html
+  var slugWilayah = buatSlugWilayah(namaWilayah);
+  var fileHTML = "kabupaten/" + slugWilayah + ".html";
 
   layer.bindPopup(
-  "<div class='popup-box'>" +
-    "<div class='popup-title'>" + namaWilayah + "</div>" +
-    "<div class='popup-content'>" +
-      "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
-      "<span class='popup-label'>Wilayah:</span> Jawa Barat<br>" +
-      "<a href='" + fileHTML + "' target='_blank' class='btn-popup'>Masuk Wilayah</a>" +
-    "</div>" +
-  "</div>"
-).openPopup();
+    "<div class='popup-box'>" +
+      "<div class='popup-title'>" + namaWilayah + "</div>" +
+      "<div class='popup-content'>" +
+        "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
+        "<span class='popup-label'>Wilayah:</span> Jawa Barat<br>" +
+        "<a href='" + fileHTML + "' class='btn-popup'>Masuk Wilayah</a>" +
+      "</div>" +
+    "</div>"
+  ).openPopup();
 }
 
     function klikWilayah(e) {
