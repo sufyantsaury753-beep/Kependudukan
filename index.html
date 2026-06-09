@@ -681,18 +681,18 @@
   var jumlahPenduduk = dataPendudukKey[key] || 0;
 
   // buat nama file HTML otomatis (misal Sumedang -> sumedang.html)
-  var fileHTML = key.toLowerCase().replace(/\s/g, '_') + ".html";
+  var fileHTML = "kabupaten/" + key.toLowerCase().replace(/\s/g, "_") + ".html";
 
   layer.bindPopup(
-    "<div class='popup-box'>" +
-      "<div class='popup-title'>" + namaWilayah + "</div>" +
-      "<div class='popup-content'>" +
-        "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
-        "<span class='popup-label'>Wilayah:</span> Jawa Barat<br>" +
-        "<a href='" + fileHTML + "' target='_blank' class='btn-popup'>Masuk Wilayah</a>" +
-      "</div>" +
-    "</div>"
-  ).openPopup();
+  "<div class='popup-box'>" +
+    "<div class='popup-title'>" + namaWilayah + "</div>" +
+    "<div class='popup-content'>" +
+      "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
+      "<span class='popup-label'>Wilayah:</span> Jawa Barat<br>" +
+      "<a href='" + fileHTML + "' target='_blank' class='btn-popup'>Masuk Wilayah</a>" +
+    "</div>" +
+  "</div>"
+).openPopup();
 }
 
     function klikWilayah(e) {
