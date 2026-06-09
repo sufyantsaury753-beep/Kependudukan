@@ -358,6 +358,21 @@
         font-size: 12px;
       }
     }
+    
+.btn-popup {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background-color: #ff9a00;
+  color: white;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.btn-popup:hover {
+  background-color: #e67e22;
+}
+    
   </style>
 </head>
 
@@ -659,28 +674,26 @@
     }
 
     function bukaPopupWilayah(layer) {
-      pilihWilayah(layer);
+  pilihWilayah(layer);
 
-      var namaWilayah = ambilNamaWilayah(layer.feature);
-      var key = kunciWilayah(namaWilayah);
-      var jumlahPenduduk = dataPendudukKey[key] || 0;
+  var namaWilayah = ambilNamaWilayah(layer.feature);
+  var key = kunciWilayah(namaWilayah);
+  var jumlahPenduduk = dataPendudukKey[key] || 0;
 
-      map.fitBounds(layer.getBounds(), {
-        padding: [30, 30]
-      });
+  // buat nama file HTML otomatis (misal Sumedang -> sumedang.html)
+  var fileHTML = key.toLowerCase().replace(/\s/g, '_') + ".html";
 
-      layer.bindPopup(
-        "<div class='popup-box'>" +
-          "<div class='popup-title'>" + namaWilayah + "</div>" +
-          "<div class='popup-content'>" +
-            "<span class='popup-label'>Jumlah penduduk:</span> " +
-            jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
-            "<span class='popup-label'>Wilayah:</span> Jawa Barat<br>" +
-            "<span class='badge'>Data Penduduk 2025</span>" +
-          "</div>" +
-        "</div>"
-      ).openPopup();
-    }
+  layer.bindPopup(
+    "<div class='popup-box'>" +
+      "<div class='popup-title'>" + namaWilayah + "</div>" +
+      "<div class='popup-content'>" +
+        "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
+        "<span class='popup-label'>Wilayah:</span> Jawa Barat<br>" +
+        "<a href='" + fileHTML + "' target='_blank' class='btn-popup'>Masuk Wilayah</a>" +
+      "</div>" +
+    "</div>"
+  ).openPopup();
+}
 
     function klikWilayah(e) {
       if (document.activeElement) {
