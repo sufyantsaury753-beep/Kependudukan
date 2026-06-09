@@ -667,36 +667,36 @@ function bukaPopupWilayah(layer){
       document.getElementById("pendudukTertinggi").innerText = tertinggiNama;
     }
 
-    fetch("kabupaten/sumedang_kecamatan.geojson")
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error("File sumedang_kecamatan.geojson tidak ditemukan.");
-        }
+    fetch("./sumedang_kecamatan.geojson")
+  .then(function(response) {
+    if (!response.ok) {
+      throw new Error("File sumedang_kecamatan.geojson tidak ditemukan.");
+    }
 
-        return response.json();
-      })
-      .then(function(data) {
-        geojsonLayer = L.geoJSON(data, {
-          style: styleWilayah,
-          onEachFeature: onEachWilayah
-        }).addTo(map);
+    return response.json();
+  })
+  .then(function(data) {
+    geojsonLayer = L.geoJSON(data, {
+      style: styleWilayah,
+      onEachFeature: onEachWilayah
+    }).addTo(map);
 
-        var boundsSumedang = geojsonLayer.getBounds();
+    var boundsSumedang = geojsonLayer.getBounds();
 
-        map.fitBounds(boundsSumedang, {
-          padding: [20, 20]
-        });
+    map.fitBounds(boundsSumedang, {
+      padding: [20, 20]
+    });
 
-        map.setMaxBounds(boundsSumedang.pad(0.05));
-        map.setMinZoom(map.getZoom());
+    map.setMaxBounds(boundsSumedang.pad(0.05));
+    map.setMinZoom(map.getZoom());
 
-        buatDaftarWilayah();
-        updateRingkasan();
-      })
-      .catch(function(error) {
-        alert("GeoJSON belum terbaca. Pastikan file sumedang_kecamatan.geojson berada satu folder dengan index.html.");
-        console.error(error);
-      });
+    buatDaftarWilayah();
+    updateRingkasan();
+  })
+  .catch(function(error) {
+    alert("GeoJSON belum terbaca. Pastikan file sumedang_kecamatan.geojson berada satu folder dengan sumedang.html.");
+    console.error(error);
+  });
   </script>
 </body>
 </html>
