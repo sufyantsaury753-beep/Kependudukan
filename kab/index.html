@@ -667,7 +667,7 @@ function bukaPopupWilayah(layer){
       document.getElementById("pendudukTertinggi").innerText = tertinggiNama;
     }
 
-    fetch("sumedang_kecamatan.geojson")
+    fetch("kab/sumedang_kecamatan.geojson")
       .then(function(response) {
         if (!response.ok) {
           throw new Error("File sumedang_kecamatan.geojson tidak ditemukan.");
@@ -694,7 +694,7 @@ function bukaPopupWilayah(layer){
         updateRingkasan();
       })
       .catch(function(error) {
-        alert("GeoJSON belum terbaca. Pastikan file sumedang_kecamatan.geojson berada satu folder dengan index.html.");
+        alert("GeoJSON belum terbaca. Pastikan file kab/sumedang_kecamatan.geojson berada satu folder dengan index.html.");
         console.error(error);
       });
   </script>
