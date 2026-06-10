@@ -526,14 +526,17 @@
 function highlightWilayah(e) {
   var layer = e.target;
 
-  // Jika ada popup aktif, jangan ubah warna layer
-  if (popupActiveLayer) return;
+  if (layer === selectedLayer) return;
 
   layer.setStyle({
     weight: 3,
-    color: "##ff9a00",
-    fillOpacity: 0.92
+    color: "#ff9a00",
+    fillOpacity: 0.92,
+    dashArray: ""
   });
+
+  layer.bringToFront();
+}
 
   layer.bringToFront();
 }
@@ -541,27 +544,37 @@ function highlightWilayah(e) {
 function resetHighlight(e) {
   var layer = e.target;
 
-  if (popupActiveLayer === layer) return;
-
-  geojsonLayer.resetStyle(layer);
+  if (layer !== selectedLayer) {
+    geojsonLayer.resetStyle(layer);
+  }
 }
 
+function pilihWilayah(layer) {
+  if (selectedLayer && selectedLayer !== layer) {
+    geojsonLayer.resetStyle(selectedLayer);
+  }
+
+  selectedLayer = layer;
+
+  layer.setStyle({
+    fillOpacity: 0.08,
+    fillColor: "#ffffff",
+    weight: 4,
+    color: "#111827",
+    opacity: 1,
+    dashArray: "6 4"
+  });
+
+  layer.bringToFront();
+}
+    
 function bukaPopupWilayah(layer){
   if (document.activeElement) document.activeElement.blur();
 
+  pilihWilayah(layer);
+
   var namaWilayah = ambilNamaWilayah(layer.feature);
   var jumlahPenduduk = dataPenduduk[namaWilayah] || 0;
-
-  layer.setStyle({
-        fillOpacity: 0.08,
-        fillColor: "#ffffff",
-        weight: 4,
-        color: "#111827",
-        opacity: 1,
-        dashArray: "6 4"
-      });
-
-  popupActiveLayer = layer;
 
   map.fitBounds(layer.getBounds(), { padding:[30,30] });
 
@@ -577,11 +590,7 @@ function bukaPopupWilayah(layer){
       "</div>" +
     "</div>"
   ).openPopup();
-
-  layer.once('popupclose', function(){
-    geojsonLayer.resetStyle(layer);
-    popupActiveLayer = null; // hapus status popup aktif
-  });
+}
 }
 
     function klikWilayah(e) {
@@ -599,13 +608,10 @@ function bukaPopupWilayah(layer){
       layerWilayah[key] = layer;
 
       layer.on({
-        mouseover: highlightWilayah,
-        mouseout: resetHighlight,
-        click: klikWilayah,
-        popupclose: function() {
-          geojsonLayer.resetStyle(layer);
-        }
-      });
+  mouseover: highlightWilayah,
+  mouseout: resetHighlight,
+  click: klikWilayah
+});
 
       layer.bindTooltip("Kecamatan " + namaWilayah, {
         sticky: true,
