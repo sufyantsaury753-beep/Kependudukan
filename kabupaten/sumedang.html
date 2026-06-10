@@ -438,273 +438,297 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <script>
-    var map = L.map("map", {
-      minZoom: 10,
-      maxZoom: 16,
-      zoomControl: true
-    }).setView([-6.85, 107.92], 11);
+  var map = L.map("map", {
+    minZoom: 10,
+    maxZoom: 16,
+    zoomControl: true
+  }).setView([-6.85, 107.92], 11);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors"
-    }).addTo(map);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors"
+  }).addTo(map);
 
-    var dataPenduduk = {
-      "Jatinangor": 101493,
-      "Cimanggung": 91399,
-      "Tanjungsari": 90737,
-      "Sukasari": 33263,
-      "Pamulihan": 66191,
-      "Rancakalong": 40966,
-      "Sumedang Selatan": 80920,
-      "Sumedang Utara": 103373,
-      "Ganeas": 26282,
-      "Situraja": 43801,
-      "Cisitu": 31455,
-      "Darmaraja": 35939,
-      "Cibugel": 25170,
-      "Wado": 43987,
-      "Jatinunggal": 46775,
-      "Jatigede": 21946,
-      "Tomo": 23033,
-      "Ujungjaya": 32050,
-      "Conggeang": 28296,
-      "Paseh": 38294,
-      "Cimalaka": 64855,
-      "Cisarua": 20882,
-      "Tanjungkerta": 34086,
-      "Tanjungmedar": 26679,
-      "Buahdua": 31954,
-      "Surian": 11705
+  var dataPenduduk = {
+    "Jatinangor": 101493,
+    "Cimanggung": 91399,
+    "Tanjungsari": 90737,
+    "Sukasari": 33263,
+    "Pamulihan": 66191,
+    "Rancakalong": 40966,
+    "Sumedang Selatan": 80920,
+    "Sumedang Utara": 103373,
+    "Ganeas": 26282,
+    "Situraja": 43801,
+    "Cisitu": 31455,
+    "Darmaraja": 35939,
+    "Cibugel": 25170,
+    "Wado": 43987,
+    "Jatinunggal": 46775,
+    "Jatigede": 21946,
+    "Tomo": 23033,
+    "Ujungjaya": 32050,
+    "Conggeang": 28296,
+    "Paseh": 38294,
+    "Cimalaka": 64855,
+    "Cisarua": 20882,
+    "Tanjungkerta": 34086,
+    "Tanjungmedar": 26679,
+    "Buahdua": 31954,
+    "Surian": 11705
+  };
+
+  var geojsonLayer;
+  var selectedLayer = null;
+  var layerWilayah = {};
+  var dataPendudukKey = {};
+
+  function kunciWilayah(nama) {
+    return nama
+      .toString()
+      .toLowerCase()
+      .replace(/kecamatan/g, "")
+      .replace(/kec\./g, "")
+      .replace(/\bkec\b/g, "")
+      .replace(/_/g, " ")
+      .replace(/\./g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  Object.keys(dataPenduduk).forEach(function(nama) {
+    dataPendudukKey[kunciWilayah(nama)] = dataPenduduk[nama];
+  });
+
+  function ambilNamaWilayah(feature) {
+    var props = feature.properties || {};
+
+    return props.kecamatan ||
+      props.KECAMATAN ||
+      props.KEC ||
+      props.WADMKC ||
+      props.NAMOBJ ||
+      props.name ||
+      props.NAMA ||
+      "";
+  }
+
+  function warnaPenduduk(jumlah) {
+    if (jumlah === null || jumlah === undefined || isNaN(jumlah)) return "#9ca3af";
+    if (jumlah >= 100000) return "#7f1d1d";
+    if (jumlah >= 80000) return "#dc2626";
+    if (jumlah >= 60000) return "#f97316";
+    if (jumlah >= 40000) return "#ff9a00";
+    if (jumlah >= 20000) return "#facc15";
+    if (jumlah > 0) return "#fde68a";
+    return "#9ca3af";
+  }
+
+  function styleWilayah(feature) {
+    var namaWilayah = ambilNamaWilayah(feature);
+    var key = kunciWilayah(namaWilayah);
+    var jumlahPenduduk = dataPendudukKey[key] || null;
+
+    return {
+      fillColor: warnaPenduduk(jumlahPenduduk),
+      weight: 1.3,
+      opacity: 1,
+      color: "#ffffff",
+      fillOpacity: 0.78,
+      dashArray: ""
     };
-
-    var geojsonLayer;
-    var layerWilayah = {};
-
-    function kunciWilayah(nama) {
-      return nama
-        .toString()
-        .toLowerCase()
-        .replace(/kecamatan/g, "")
-        .replace(/kec\./g, "")
-        .replace(/_/g, " ")
-        .replace(/\./g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-
-    function ambilNamaWilayah(feature) {
-      var props = feature.properties || {};
-      return props.kecamatan || props.KECAMATAN || props.NAMOBJ || props.name || "";
-    }
-
-    function warnaPenduduk(jumlah) {
-      if (jumlah === null || jumlah === undefined || isNaN(jumlah)) return "#9ca3af";
-      if (jumlah >= 100000) return "#7f1d1d";
-      if (jumlah >= 80000) return "#dc2626";
-      if (jumlah >= 60000) return "#f97316";
-      if (jumlah >= 40000) return "#ff9a00";
-      if (jumlah >= 20000) return "#facc15";
-      if (jumlah > 0) return "#fde68a";
-      return "#9ca3af";
-    }
-
-    function styleWilayah(feature) {
-      var namaWilayah = ambilNamaWilayah(feature);
-      var jumlahPenduduk = dataPenduduk[namaWilayah] || 0;
-
-      return {
-  fillColor: warnaPenduduk(jumlahPenduduk),
-  weight: 1.3,
-  opacity: 1,
-  color: "#ffffff",
-  fillOpacity: 0.78,
-  dashArray: ""
-};
-    }
-
-    var popupActiveLayer = null;
-
-function highlightWilayah(e) {
-  var layer = e.target;
-
-  if (layer === selectedLayer) return;
-
-  layer.setStyle({
-    weight: 3,
-    color: "#ff9a00",
-    fillOpacity: 0.92,
-    dashArray: ""
-  });
-
-  layer.bringToFront();
-}
-
-  layer.bringToFront();
-}
-
-function resetHighlight(e) {
-  var layer = e.target;
-
-  if (layer !== selectedLayer) {
-    geojsonLayer.resetStyle(layer);
-  }
-}
-
-function pilihWilayah(layer) {
-  if (selectedLayer && selectedLayer !== layer) {
-    geojsonLayer.resetStyle(selectedLayer);
   }
 
-  selectedLayer = layer;
+  function highlightWilayah(e) {
+    var layer = e.target;
 
-  layer.setStyle({
-    fillOpacity: 0.08,
-    fillColor: "#ffffff",
-    weight: 4,
-    color: "#111827",
-    opacity: 1,
-    dashArray: "6 4"
-  });
+    if (layer === selectedLayer) return;
 
-  layer.bringToFront();
-}
-    
-function bukaPopupWilayah(layer){
-  if (document.activeElement) document.activeElement.blur();
-
-  pilihWilayah(layer);
-
-  var namaWilayah = ambilNamaWilayah(layer.feature);
-  var jumlahPenduduk = dataPenduduk[namaWilayah] || 0;
-
-  map.fitBounds(layer.getBounds(), { padding:[30,30] });
-
-  layer.unbindPopup();
-
-  layer.bindPopup(
-    "<div class='popup-box'>" +
-      "<div class='popup-title'>Kecamatan " + namaWilayah + "</div>" +
-      "<div class='popup-content'>" +
-        "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
-        "<span class='popup-label'>Wilayah:</span> Kabupaten Sumedang<br>" +
-        "<span class='badge'>Data Penduduk</span>" +
-      "</div>" +
-    "</div>"
-  ).openPopup();
-}
-}
-
-    function klikWilayah(e) {
-      if (document.activeElement) {
-        document.activeElement.blur();
-      }
-
-      bukaPopupWilayah(e.target);
-    }
-
-    function onEachWilayah(feature, layer) {
-      var namaWilayah = ambilNamaWilayah(feature);
-      var key = kunciWilayah(namaWilayah);
-
-      layerWilayah[key] = layer;
-
-      layer.on({
-  mouseover: highlightWilayah,
-  mouseout: resetHighlight,
-  click: klikWilayah
-});
-
-      layer.bindTooltip("Kecamatan " + namaWilayah, {
-        sticky: true,
-        direction: "top"
-      });
-    }
-
-    function buatDaftarWilayah() {
-      var list = document.getElementById("wilayahList");
-      var wilayahArray = Object.keys(dataPenduduk).sort();
-
-      list.innerHTML = "";
-
-      wilayahArray.forEach(function(namaWilayah) {
-        var jumlahPenduduk = dataPenduduk[namaWilayah];
-        var key = kunciWilayah(namaWilayah);
-        var item = document.createElement("div");
-
-        item.className = "wilayah-item";
-        item.dataset.key = key;
-        item.innerHTML =
-          "<h4>Kecamatan " + namaWilayah + "</h4>" +
-          "<span>" + jumlahPenduduk.toLocaleString("id-ID") + " jiwa</span>";
-
-        item.onclick = function() {
-          document.querySelector(".map-card").scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
-
-          if (layerWilayah[key]) {
-            bukaPopupWilayah(layerWilayah[key]);
-          } else {
-            alert("Nama kecamatan tidak cocok dengan GeoJSON: " + namaWilayah);
-          }
-        };
-
-        list.appendChild(item);
-      });
-    }
-
-    function updateRingkasan() {
-      var daftarWilayah = Object.keys(dataPenduduk);
-      var total = 0;
-      var tertinggiNama = "";
-      var tertinggiJumlah = 0;
-
-      daftarWilayah.forEach(function(nama) {
-        var jumlah = dataPenduduk[nama];
-        total += jumlah;
-
-        if (jumlah > tertinggiJumlah) {
-          tertinggiJumlah = jumlah;
-          tertinggiNama = nama;
-        }
-      });
-
-      document.getElementById("jumlahWilayah").innerText = daftarWilayah.length;
-      document.getElementById("totalPenduduk").innerText = total.toLocaleString("id-ID");
-      document.getElementById("pendudukTertinggi").innerText = tertinggiNama;
-    }
-
-    fetch("./sumedang_kecamatan.geojson")
-  .then(function(response) {
-    if (!response.ok) {
-      throw new Error("File sumedang_kecamatan.geojson tidak ditemukan.");
-    }
-
-    return response.json();
-  })
-  .then(function(data) {
-    geojsonLayer = L.geoJSON(data, {
-      style: styleWilayah,
-      onEachFeature: onEachWilayah
-    }).addTo(map);
-
-    var boundsSumedang = geojsonLayer.getBounds();
-
-    map.fitBounds(boundsSumedang, {
-      padding: [20, 20]
+    layer.setStyle({
+      weight: 3,
+      color: "#ff9a00",
+      fillOpacity: 0.92,
+      dashArray: ""
     });
 
-    map.setMaxBounds(boundsSumedang.pad(0.05));
-    map.setMinZoom(map.getZoom());
+    layer.bringToFront();
+  }
 
-    buatDaftarWilayah();
-    updateRingkasan();
-  })
-  .catch(function(error) {
-    alert("GeoJSON belum terbaca. Pastikan file sumedang_kecamatan.geojson berada satu folder dengan sumedang.html.");
-    console.error(error);
-  });
-  </script>
+  function resetHighlight(e) {
+    var layer = e.target;
+
+    if (layer !== selectedLayer) {
+      geojsonLayer.resetStyle(layer);
+    }
+  }
+
+  function aktifkanItemSidebar(key) {
+    var semuaItem = document.querySelectorAll(".wilayah-item");
+
+    semuaItem.forEach(function(item) {
+      item.classList.toggle("active", item.dataset.key === key);
+    });
+  }
+
+  function pilihWilayah(layer) {
+    if (selectedLayer && selectedLayer !== layer) {
+      geojsonLayer.resetStyle(selectedLayer);
+    }
+
+    selectedLayer = layer;
+
+    var namaWilayah = ambilNamaWilayah(layer.feature);
+    var key = kunciWilayah(namaWilayah);
+
+    layer.setStyle({
+      fillOpacity: 0.08,
+      fillColor: "#ffffff",
+      weight: 4,
+      color: "#111827",
+      opacity: 1,
+      dashArray: "6 4"
+    });
+
+    layer.bringToFront();
+    aktifkanItemSidebar(key);
+  }
+
+  function bukaPopupWilayah(layer) {
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
+
+    pilihWilayah(layer);
+
+    var namaWilayah = ambilNamaWilayah(layer.feature);
+    var key = kunciWilayah(namaWilayah);
+    var jumlahPenduduk = dataPendudukKey[key] || 0;
+
+    map.fitBounds(layer.getBounds(), {
+      padding: [30, 30]
+    });
+
+    layer.unbindPopup();
+
+    layer.bindPopup(
+      "<div class='popup-box'>" +
+        "<div class='popup-title'>Kecamatan " + namaWilayah + "</div>" +
+        "<div class='popup-content'>" +
+          "<span class='popup-label'>Jumlah penduduk:</span> " + jumlahPenduduk.toLocaleString("id-ID") + " jiwa<br>" +
+          "<span class='popup-label'>Wilayah:</span> Kabupaten Sumedang<br>" +
+          "<span class='badge'>Data Penduduk</span>" +
+        "</div>" +
+      "</div>"
+    ).openPopup();
+  }
+
+  function klikWilayah(e) {
+    bukaPopupWilayah(e.target);
+  }
+
+  function onEachWilayah(feature, layer) {
+    var namaWilayah = ambilNamaWilayah(feature);
+    var key = kunciWilayah(namaWilayah);
+
+    layerWilayah[key] = layer;
+
+    layer.on({
+      mouseover: highlightWilayah,
+      mouseout: resetHighlight,
+      click: klikWilayah
+    });
+
+    layer.bindTooltip("Kecamatan " + namaWilayah, {
+      sticky: true,
+      direction: "top"
+    });
+  }
+
+  function buatDaftarWilayah() {
+    var list = document.getElementById("wilayahList");
+    var wilayahArray = Object.keys(dataPenduduk).sort();
+
+    list.innerHTML = "";
+
+    wilayahArray.forEach(function(namaWilayah) {
+      var jumlahPenduduk = dataPenduduk[namaWilayah];
+      var key = kunciWilayah(namaWilayah);
+      var item = document.createElement("div");
+
+      item.className = "wilayah-item";
+      item.dataset.key = key;
+
+      item.innerHTML =
+        "<h4>Kecamatan " + namaWilayah + "</h4>" +
+        "<span>" + jumlahPenduduk.toLocaleString("id-ID") + " jiwa</span>";
+
+      item.onclick = function() {
+        document.querySelector(".map-card").scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+        if (layerWilayah[key]) {
+          bukaPopupWilayah(layerWilayah[key]);
+        } else {
+          alert("Nama kecamatan tidak cocok dengan GeoJSON: " + namaWilayah);
+        }
+      };
+
+      list.appendChild(item);
+    });
+  }
+
+  function updateRingkasan() {
+    var daftarWilayah = Object.keys(dataPenduduk);
+    var total = 0;
+    var tertinggiNama = "";
+    var tertinggiJumlah = 0;
+
+    daftarWilayah.forEach(function(nama) {
+      var jumlah = dataPenduduk[nama];
+      total += jumlah;
+
+      if (jumlah > tertinggiJumlah) {
+        tertinggiJumlah = jumlah;
+        tertinggiNama = nama;
+      }
+    });
+
+    document.getElementById("jumlahWilayah").innerText = daftarWilayah.length;
+    document.getElementById("totalPenduduk").innerText = total.toLocaleString("id-ID");
+    document.getElementById("pendudukTertinggi").innerText = tertinggiNama;
+  }
+
+  fetch("./sumedang_kecamatan.geojson")
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error("File sumedang_kecamatan.geojson tidak ditemukan.");
+      }
+
+      return response.json();
+    })
+    .then(function(data) {
+      geojsonLayer = L.geoJSON(data, {
+        style: styleWilayah,
+        onEachFeature: onEachWilayah
+      }).addTo(map);
+
+      var boundsSumedang = geojsonLayer.getBounds();
+
+      map.fitBounds(boundsSumedang, {
+        padding: [20, 20]
+      });
+
+      map.setMaxBounds(boundsSumedang.pad(0.05));
+      map.setMinZoom(map.getZoom());
+
+      buatDaftarWilayah();
+      updateRingkasan();
+    })
+    .catch(function(error) {
+      alert("GeoJSON belum terbaca. Pastikan file sumedang_kecamatan.geojson berada satu folder dengan sumedang.html.");
+      console.error(error);
+    });
+</script>
 </body>
 </html>
