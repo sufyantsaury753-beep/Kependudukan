@@ -442,244 +442,345 @@
 
   <script>
     var batasJawaBarat = [
-      [-7.90, 106.30],
-      [-5.80, 108.90]
-    ];
+  [-7.90, 106.30],
+  [-5.80, 108.90]
+];
 
-    var map = L.map("map", {
-      maxBounds: batasJawaBarat,
-      maxBoundsViscosity: 1.0,
-      minZoom: 8,
-      maxZoom: 14,
-      zoomControl: true
-    }).setView([-6.95, 107.70], 8);
+var map = L.map("map", {
+  maxBounds: batasJawaBarat,
+  maxBoundsViscosity: 1.0,
+  minZoom: 8,
+  maxZoom: 14,
+  zoomControl: true
+}).setView([-6.95, 107.70], 8);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap contributors"
-    }).addTo(map);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap contributors"
+}).addTo(map);
 
-    var dataPenduduk = {
-      "Kabupaten Bogor": 5721620,
-      "Kabupaten Sukabumi": 2852110,
-      "Kabupaten Cianjur": 2610320,
-      "Kabupaten Bandung": 3783210,
-      "Kabupaten Garut": 2748700,
-      "Kabupaten Tasikmalaya": 1933810,
-      "Kabupaten Ciamis": 1266330,
-      "Kabupaten Kuningan": 1225490,
-      "Kabupaten Cirebon": 2413810,
-      "Kabupaten Majalengka": 1363760,
-      "Kabupaten Sumedang": 1195530,
-      "Kabupaten Indramayu": 1932520,
-      "Kabupaten Subang": 1675520,
-      "Kabupaten Purwakarta": 1062970,
-      "Kabupaten Karawang": 2581250,
-      "Kabupaten Bekasi": 3303020,
-      "Kabupaten Bandung Barat": 1907820,
-      "Kabupaten Pangandaran": 436490,
-      "Kota Bogor": 1083780,
-      "Kota Sukabumi": 370680,
-      "Kota Bandung": 2548780,
-      "Kota Cirebon": 347540,
-      "Kota Bekasi": 2648270,
-      "Kota Depok": 2167960,
-      "Kota Cimahi": 606380,
-      "Kota Tasikmalaya": 759370,
-      "Kota Banjar": 211960
-    };
+var dataPenduduk = {
+  "Kabupaten Bogor": 5721620,
+  "Kabupaten Sukabumi": 2852110,
+  "Kabupaten Cianjur": 2610320,
+  "Kabupaten Bandung": 3783210,
+  "Kabupaten Garut": 2748700,
+  "Kabupaten Tasikmalaya": 1933810,
+  "Kabupaten Ciamis": 1266330,
+  "Kabupaten Kuningan": 1225490,
+  "Kabupaten Cirebon": 2413810,
+  "Kabupaten Majalengka": 1363760,
+  "Kabupaten Sumedang": 1195530,
+  "Kabupaten Indramayu": 1932520,
+  "Kabupaten Subang": 1675520,
+  "Kabupaten Purwakarta": 1062970,
+  "Kabupaten Karawang": 2581250,
+  "Kabupaten Bekasi": 3303020,
+  "Kabupaten Bandung Barat": 1907820,
+  "Kabupaten Pangandaran": 436490,
 
-    var geojsonLayer;
-    var selectedLayer = null;
-    var layerWilayah = {};
-    var dataPendudukKey = {};
+  "Kota Bogor": 1083780,
+  "Kota Sukabumi": 370680,
+  "Kota Bandung": 2548780,
+  "Kota Cirebon": 347540,
+  "Kota Bekasi": 2648270,
+  "Kota Depok": 2167960,
+  "Kota Cimahi": 606380,
+  "Kota Tasikmalaya": 759370,
+  "Kota Banjar": 211960
+};
 
-    function kapitalAwal(teks) {
-      return teks.toLowerCase().replace(/\b\w/g, function(huruf) {
-        return huruf.toUpperCase();
-      });
-    }
+var kodeWilayah = {
+  "3201": "Kabupaten Bogor",
+  "3202": "Kabupaten Sukabumi",
+  "3203": "Kabupaten Cianjur",
+  "3204": "Kabupaten Bandung",
+  "3205": "Kabupaten Garut",
+  "3206": "Kabupaten Tasikmalaya",
+  "3207": "Kabupaten Ciamis",
+  "3208": "Kabupaten Kuningan",
+  "3209": "Kabupaten Cirebon",
+  "3210": "Kabupaten Majalengka",
+  "3211": "Kabupaten Sumedang",
+  "3212": "Kabupaten Indramayu",
+  "3213": "Kabupaten Subang",
+  "3214": "Kabupaten Purwakarta",
+  "3215": "Kabupaten Karawang",
+  "3216": "Kabupaten Bekasi",
+  "3217": "Kabupaten Bandung Barat",
+  "3218": "Kabupaten Pangandaran",
 
-    function ambilNamaMentah(feature) {
-      var props = feature.properties || {};
+  "3271": "Kota Bogor",
+  "3272": "Kota Sukabumi",
+  "3273": "Kota Bandung",
+  "3274": "Kota Cirebon",
+  "3275": "Kota Bekasi",
+  "3276": "Kota Depok",
+  "3277": "Kota Cimahi",
+  "3278": "Kota Tasikmalaya",
+  "3279": "Kota Banjar"
+};
 
-      return props.WADMKK ||
-        props.KAB_KOTA ||
-        props.KABKOT ||
-        props.NAME_2 ||
-        props.NAMOBJ ||
-        props.name ||
-        props.NAMA ||
-        props.KABUPATEN ||
-        props.KOTA ||
-        "";
-    }
+var daftarKota = [
+  "Bogor",
+  "Sukabumi",
+  "Bandung",
+  "Cirebon",
+  "Bekasi",
+  "Depok",
+  "Cimahi",
+  "Tasikmalaya",
+  "Banjar"
+];
 
-    function ambilNamaWilayah(feature) {
-      var props = feature.properties || {};
-      var nama = ambilNamaMentah(feature).toString().trim();
-      var gabunganProps = Object.values(props).join(" ").toLowerCase();
+var geojsonLayer;
+var selectedLayer = null;
+var layerWilayah = {};
+var dataPendudukKey = {};
 
-      nama = nama.replace(/Regency/gi, "");
-      nama = nama.replace(/City/gi, "");
-      nama = nama.replace(/KAB\./gi, "Kabupaten");
-      nama = nama.replace(/KOTA\./gi, "Kota");
-      nama = kapitalAwal(nama.trim());
+function kapitalAwal(teks) {
+  return teks.toLowerCase().replace(/\b\w/g, function(huruf) {
+    return huruf.toUpperCase();
+  });
+}
 
-      var mengandungKota =
-        gabunganProps.includes("kota") ||
-        gabunganProps.includes("city") ||
-        gabunganProps.includes("municipality") ||
-        gabunganProps.includes("kodya");
+function kunciWilayah(nama) {
+  var teks = nama.toString().toLowerCase().trim();
 
-      var mengandungKabupaten =
-        gabunganProps.includes("kabupaten") ||
-        gabunganProps.includes("kab.") ||
-        gabunganProps.includes("regency");
+  teks = teks.replace(/_/g, " ");
+  teks = teks.replace(/\./g, " ");
+  teks = teks.replace(/-/g, " ");
+  teks = teks.replace(/\bregency\b/g, "kabupaten");
+  teks = teks.replace(/\bcity\b/g, "kota");
+  teks = teks.replace(/\bkab\b/g, "kabupaten");
+  teks = teks.replace(/\bkodya\b/g, "kota");
+  teks = teks.replace(/\s+/g, " ").trim();
 
-      if (!nama.startsWith("Kabupaten") && !nama.startsWith("Kota")) {
-        if (mengandungKota) {
-          nama = "Kota " + nama;
-        } else if (mengandungKabupaten) {
-          nama = "Kabupaten " + nama;
-        } else if (["Banjar", "Cimahi", "Depok"].includes(nama)) {
-          nama = "Kota " + nama;
-        } else {
-          nama = "Kabupaten " + nama;
+  if (teks.endsWith(" kabupaten")) {
+    teks = "kabupaten " + teks.replace(" kabupaten", "").trim();
+  }
+
+  if (teks.endsWith(" kota")) {
+    teks = "kota " + teks.replace(" kota", "").trim();
+  }
+
+  return teks;
+}
+
+Object.keys(dataPenduduk).forEach(function(nama) {
+  dataPendudukKey[kunciWilayah(nama)] = dataPenduduk[nama];
+});
+
+function ambilKodeWilayah(feature) {
+  var props = feature.properties || {};
+
+  var kandidatKode = [
+    props.KODE,
+    props.KODE_KAB,
+    props.KODEKAB,
+    props.KODE_KK,
+    props.KODE_KABKOT,
+    props.KABKOTNO,
+    props.KDPKAB,
+    props.KDPPUM,
+    props.WADMKK_CODE,
+    props.CODE,
+    props.ID,
+    props.ID_KAB,
+    props.IDKAB,
+    props.KAB_CODE,
+    props.KABKOT_CODE
+  ];
+
+  for (var i = 0; i < kandidatKode.length; i++) {
+    if (kandidatKode[i] !== undefined && kandidatKode[i] !== null) {
+      var kode = kandidatKode[i].toString().replace(/\D/g, "");
+
+      if (kode.length >= 4) {
+        kode = kode.substring(0, 4);
+
+        if (kodeWilayah[kode]) {
+          return kode;
         }
       }
-
-      return nama;
     }
+  }
 
-    function kunciWilayah(nama) {
-      var teks = nama.toString().toLowerCase().trim();
+  var semuaProps = Object.values(props).join(" ");
+  var semuaKode = semuaProps.match(/\b32\d{2}\b/g);
 
-      teks = teks.replace(/_/g, " ");
-      teks = teks.replace(/\./g, " ");
-      teks = teks.replace(/\bregency\b/g, "kabupaten");
-      teks = teks.replace(/\bcity\b/g, "kota");
-      teks = teks.replace(/\bkab\b/g, "kabupaten");
-      teks = teks.replace(/\bkodya\b/g, "kota");
-      teks = teks.replace(/\s+/g, " ").trim();
-
-      if (teks.endsWith(" kabupaten")) {
-        teks = "kabupaten " + teks.replace(" kabupaten", "").trim();
-      }
-
-      if (teks.endsWith(" kota")) {
-        teks = "kota " + teks.replace(" kota", "").trim();
-      }
-
-      return teks;
-    }
-
-    Object.keys(dataPenduduk).forEach(function(nama) {
-      dataPendudukKey[kunciWilayah(nama)] = dataPenduduk[nama];
-    });
-
-    function warnaPenduduk(jumlah) {
-      if (jumlah === null || jumlah === undefined || isNaN(jumlah)) {
-        return "#9ca3af";
-      }
-
-      if (jumlah >= 5000000) {
-        return "#7f1d1d";
-      }
-
-      if (jumlah >= 3000000) {
-        return "#dc2626";
-      }
-
-      if (jumlah >= 2000000) {
-        return "#f97316";
-      }
-
-      if (jumlah >= 1000000) {
-        return "#ff9a00";
-      }
-
-      if (jumlah >= 500000) {
-        return "#facc15";
-      }
-
-      if (jumlah > 0) {
-        return "#fde68a";
-      }
-
-      return "#9ca3af";
-    }
-
-    function styleWilayah(feature) {
-      var namaWilayah = ambilNamaWilayah(feature);
-      var key = kunciWilayah(namaWilayah);
-      var adaData = Object.prototype.hasOwnProperty.call(dataPendudukKey, key);
-      var jumlahPenduduk = adaData ? dataPendudukKey[key] : null;
-
-      return {
-        fillColor: warnaPenduduk(jumlahPenduduk),
-        weight: 1.3,
-        opacity: 1,
-        color: "#ffffff",
-        fillOpacity: 0.78,
-        dashArray: ""
-      };
-    }
-
-    function highlightWilayah(e) {
-      var layer = e.target;
-
-      if (layer === selectedLayer) {
-        return;
-      }
-
-      layer.setStyle({
-        weight: 3,
-        color: "#ff9a00",
-        fillOpacity: 0.92,
-        dashArray: ""
-      });
-
-      layer.bringToFront();
-    }
-
-    function resetHighlight(e) {
-      if (e.target !== selectedLayer) {
-        geojsonLayer.resetStyle(e.target);
+  if (semuaKode) {
+    for (var j = 0; j < semuaKode.length; j++) {
+      if (kodeWilayah[semuaKode[j]]) {
+        return semuaKode[j];
       }
     }
+  }
 
-    function aktifkanItemSidebar(key) {
-      var semuaItem = document.querySelectorAll(".wilayah-item");
+  return null;
+}
 
-      semuaItem.forEach(function(item) {
-        item.classList.toggle("active", item.dataset.key === key);
-      });
+function ambilNamaMentah(feature) {
+  var props = feature.properties || {};
+
+  return props.WADMKK ||
+    props.KAB_KOTA ||
+    props.KABKOT ||
+    props.NAME_2 ||
+    props.NAMOBJ ||
+    props.name ||
+    props.NAMA ||
+    props.KABUPATEN ||
+    props.KOTA ||
+    "";
+}
+
+function ambilNamaWilayah(feature) {
+  var kode = ambilKodeWilayah(feature);
+
+  if (kode && kodeWilayah[kode]) {
+    return kodeWilayah[kode];
+  }
+
+  var props = feature.properties || {};
+  var nama = ambilNamaMentah(feature).toString().trim();
+  var gabunganProps = Object.values(props).join(" ").toLowerCase();
+
+  nama = nama.replace(/Regency/gi, "");
+  nama = nama.replace(/City/gi, "");
+  nama = nama.replace(/KAB\./gi, "Kabupaten");
+  nama = nama.replace(/KOTA\./gi, "Kota");
+  nama = nama.replace(/\s+/g, " ");
+  nama = kapitalAwal(nama.trim());
+
+  var mengandungKota =
+    gabunganProps.includes("kota") ||
+    gabunganProps.includes("city") ||
+    gabunganProps.includes("municipality") ||
+    gabunganProps.includes("kodya");
+
+  var mengandungKabupaten =
+    gabunganProps.includes("kabupaten") ||
+    gabunganProps.includes("kab.") ||
+    gabunganProps.includes("regency");
+
+  if (!nama.startsWith("Kabupaten") && !nama.startsWith("Kota")) {
+    if (mengandungKota) {
+      nama = "Kota " + nama;
+    } else if (mengandungKabupaten) {
+      nama = "Kabupaten " + nama;
+    } else if (daftarKota.includes(nama)) {
+      nama = "Kota " + nama;
+    } else {
+      nama = "Kabupaten " + nama;
     }
+  }
 
-    function pilihWilayah(layer) {
-      if (selectedLayer && selectedLayer !== layer) {
-        geojsonLayer.resetStyle(selectedLayer);
-      }
+  return nama;
+}
 
-      selectedLayer = layer;
+function warnaPenduduk(jumlah) {
+  if (jumlah === null || jumlah === undefined || isNaN(jumlah)) {
+    return "#9ca3af";
+  }
 
-      var namaWilayah = ambilNamaWilayah(layer.feature);
-      var key = kunciWilayah(namaWilayah);
+  if (jumlah >= 5000000) {
+    return "#7f1d1d";
+  }
 
-      layer.setStyle({
-        fillOpacity: 0.08,
-        fillColor: "#ffffff",
-        weight: 4,
-        color: "#111827",
-        opacity: 1,
-        dashArray: "6 4"
-      });
+  if (jumlah >= 3000000) {
+    return "#dc2626";
+  }
 
-      layer.bringToFront();
-      aktifkanItemSidebar(key);
-    }
+  if (jumlah >= 2000000) {
+    return "#f97316";
+  }
 
-    function buatSlugWilayah(namaWilayah) {
+  if (jumlah >= 1000000) {
+    return "#ff9a00";
+  }
+
+  if (jumlah >= 500000) {
+    return "#facc15";
+  }
+
+  if (jumlah > 0) {
+    return "#fde68a";
+  }
+
+  return "#9ca3af";
+}
+
+function styleWilayah(feature) {
+  var namaWilayah = ambilNamaWilayah(feature);
+  var key = kunciWilayah(namaWilayah);
+  var adaData = Object.prototype.hasOwnProperty.call(dataPendudukKey, key);
+  var jumlahPenduduk = adaData ? dataPendudukKey[key] : null;
+
+  return {
+    fillColor: warnaPenduduk(jumlahPenduduk),
+    weight: 1.3,
+    opacity: 1,
+    color: "#ffffff",
+    fillOpacity: 0.78,
+    dashArray: ""
+  };
+}
+
+function highlightWilayah(e) {
+  var layer = e.target;
+
+  if (layer === selectedLayer) {
+    return;
+  }
+
+  layer.setStyle({
+    weight: 3,
+    color: "#ff9a00",
+    fillOpacity: 0.92,
+    dashArray: ""
+  });
+
+  layer.bringToFront();
+}
+
+function resetHighlight(e) {
+  if (e.target !== selectedLayer) {
+    geojsonLayer.resetStyle(e.target);
+  }
+}
+
+function aktifkanItemSidebar(key) {
+  var semuaItem = document.querySelectorAll(".wilayah-item");
+
+  semuaItem.forEach(function(item) {
+    item.classList.toggle("active", item.dataset.key === key);
+  });
+}
+
+function pilihWilayah(layer) {
+  if (selectedLayer && selectedLayer !== layer) {
+    geojsonLayer.resetStyle(selectedLayer);
+  }
+
+  selectedLayer = layer;
+
+  var namaWilayah = ambilNamaWilayah(layer.feature);
+  var key = kunciWilayah(namaWilayah);
+
+  layer.setStyle({
+    fillOpacity: 0.08,
+    fillColor: "#ffffff",
+    weight: 4,
+    color: "#111827",
+    opacity: 1,
+    dashArray: "6 4"
+  });
+
+  layer.bringToFront();
+  aktifkanItemSidebar(key);
+}
+
+function buatSlugNama(namaWilayah) {
   return namaWilayah
     .toLowerCase()
     .replace("kabupaten ", "")
@@ -688,21 +789,39 @@
     .replace(/\s+/g, "_");
 }
 
+function buatFileHTMLWilayah(namaWilayah) {
+  var nama = namaWilayah.toLowerCase().trim();
+  var slug = buatSlugNama(namaWilayah);
+
+  if (nama.startsWith("kota ")) {
+    return "kabupaten/kota_" + slug + ".html";
+  }
+
+  if (nama.startsWith("kabupaten ")) {
+    return "kabupaten/" + slug + ".html";
+  }
+
+  return "kabupaten/" + slug + ".html";
+}
+
 function bukaPopupWilayah(layer) {
+  if (document.activeElement) {
+    document.activeElement.blur();
+  }
+
   pilihWilayah(layer);
 
   var namaWilayah = ambilNamaWilayah(layer.feature);
   var key = kunciWilayah(namaWilayah);
-  var jumlahPenduduk = dataPendudukKey[key] || 0;
-
-  var slugWilayah = buatSlugWilayah(namaWilayah);
-  var fileHTML = "kabupaten/" + slugWilayah + ".html";
+  var adaData = Object.prototype.hasOwnProperty.call(dataPendudukKey, key);
+  var jumlahPenduduk = adaData ? dataPendudukKey[key] : 0;
+  var fileHTML = buatFileHTMLWilayah(namaWilayah);
 
   map.fitBounds(layer.getBounds(), {
-  padding: [40, 40],
-  maxZoom: 11,
-  animate: false
-});
+    padding: [40, 40],
+    maxZoom: 11,
+    animate: false
+  });
 
   layer.unbindPopup();
 
@@ -717,117 +836,116 @@ function bukaPopupWilayah(layer) {
     "</div>"
   ).openPopup();
 }
-    function klikWilayah(e) {
-      if (document.activeElement) {
-        document.activeElement.blur();
+
+function klikWilayah(e) {
+  bukaPopupWilayah(e.target);
+}
+
+function onEachWilayah(feature, layer) {
+  var namaWilayah = ambilNamaWilayah(feature);
+  var key = kunciWilayah(namaWilayah);
+
+  layerWilayah[key] = layer;
+
+  layer.on({
+    mouseover: highlightWilayah,
+    mouseout: resetHighlight,
+    click: klikWilayah
+  });
+
+  layer.bindTooltip(namaWilayah, {
+    sticky: true,
+    direction: "top"
+  });
+}
+
+function buatDaftarWilayah() {
+  var list = document.getElementById("wilayahList");
+  var wilayahArray = Object.keys(dataPenduduk).sort();
+
+  list.innerHTML = "";
+
+  wilayahArray.forEach(function(namaWilayah) {
+    var jumlahPenduduk = dataPenduduk[namaWilayah];
+    var key = kunciWilayah(namaWilayah);
+    var item = document.createElement("div");
+
+    item.className = "wilayah-item";
+    item.dataset.key = key;
+
+    item.innerHTML =
+      "<h4>" + namaWilayah + "</h4>" +
+      "<span>" + jumlahPenduduk.toLocaleString("id-ID") + " jiwa</span>";
+
+    item.onclick = function() {
+      document.querySelector(".map-card").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+
+      if (layerWilayah[key]) {
+        bukaPopupWilayah(layerWilayah[key]);
+      } else {
+        alert("Nama wilayah tidak cocok dengan GeoJSON: " + namaWilayah);
       }
+    };
 
-      bukaPopupWilayah(e.target);
+    list.appendChild(item);
+  });
+}
+
+function updateRingkasan() {
+  var daftarWilayah = Object.keys(dataPenduduk);
+  var total = 0;
+  var tertinggiNama = "";
+  var tertinggiJumlah = 0;
+
+  daftarWilayah.forEach(function(nama) {
+    var jumlah = dataPenduduk[nama];
+    total += jumlah;
+
+    if (jumlah > tertinggiJumlah) {
+      tertinggiJumlah = jumlah;
+      tertinggiNama = nama;
+    }
+  });
+
+  document.getElementById("jumlahWilayah").innerText = daftarWilayah.length;
+  document.getElementById("totalPenduduk").innerText = total.toLocaleString("id-ID");
+  document.getElementById("pendudukTertinggi").innerText =
+    tertinggiNama.replace("Kabupaten ", "").replace("Kota ", "");
+}
+
+fetch("jabar_kabupaten.geojson")
+  .then(function(response) {
+    if (!response.ok) {
+      throw new Error("File jabar_kabupaten.geojson tidak ditemukan.");
     }
 
-    function onEachWilayah(feature, layer) {
-      var namaWilayah = ambilNamaWilayah(feature);
-      var key = kunciWilayah(namaWilayah);
+    return response.json();
+  })
+  .then(function(data) {
+    geojsonLayer = L.geoJSON(data, {
+      style: styleWilayah,
+      onEachFeature: onEachWilayah
+    }).addTo(map);
 
-      layerWilayah[key] = layer;
+    var boundsJabar = geojsonLayer.getBounds();
 
-      layer.on({
-        mouseover: highlightWilayah,
-        mouseout: resetHighlight,
-        click: klikWilayah
-      });
+    map.fitBounds(boundsJabar, {
+      padding: [20, 20]
+    });
 
-      layer.bindTooltip(namaWilayah, {
-        sticky: true,
-        direction: "top"
-      });
-    }
+    map.setMaxBounds(boundsJabar.pad(0.05));
+    map.setMinZoom(map.getZoom());
 
-    function buatDaftarWilayah() {
-      var list = document.getElementById("wilayahList");
-      var wilayahArray = Object.keys(dataPenduduk).sort();
-
-      list.innerHTML = "";
-
-      wilayahArray.forEach(function(namaWilayah) {
-        var jumlahPenduduk = dataPenduduk[namaWilayah];
-        var item = document.createElement("div");
-
-        item.className = "wilayah-item";
-        item.dataset.key = kunciWilayah(namaWilayah);
-        item.innerHTML =
-          "<h4>" + namaWilayah + "</h4>" +
-          "<span>" + jumlahPenduduk.toLocaleString("id-ID") + " jiwa</span>";
-
-        item.onclick = function() {
-          var key = kunciWilayah(namaWilayah);
-
-          document.querySelector(".map-card").scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-          });
-
-          if (layerWilayah[key]) {
-            bukaPopupWilayah(layerWilayah[key]);
-          }
-        };
-
-        list.appendChild(item);
-      });
-    }
-
-    function updateRingkasan() {
-      var daftarWilayah = Object.keys(dataPenduduk);
-      var total = 0;
-      var tertinggiNama = "";
-      var tertinggiJumlah = 0;
-
-      daftarWilayah.forEach(function(nama) {
-        var jumlah = dataPenduduk[nama];
-        total += jumlah;
-
-        if (jumlah > tertinggiJumlah) {
-          tertinggiJumlah = jumlah;
-          tertinggiNama = nama;
-        }
-      });
-
-      document.getElementById("jumlahWilayah").innerText = daftarWilayah.length;
-      document.getElementById("totalPenduduk").innerText = total.toLocaleString("id-ID");
-      document.getElementById("pendudukTertinggi").innerText =
-        tertinggiNama.replace("Kabupaten ", "").replace("Kota ", "");
-    }
-
-    fetch("jabar_kabupaten.geojson")
-      .then(function(response) {
-        if (!response.ok) {
-          throw new Error("File jabar_kabupaten.geojson tidak ditemukan.");
-        }
-
-        return response.json();
-      })
-      .then(function(data) {
-        geojsonLayer = L.geoJSON(data, {
-          style: styleWilayah,
-          onEachFeature: onEachWilayah
-        }).addTo(map);
-
-        var boundsJabar = geojsonLayer.getBounds();
-
-        map.fitBounds(boundsJabar, {
-          padding: [20, 20]
-        });
-
-        map.setMaxBounds(boundsJabar.pad(0.05));
-        map.setMinZoom(map.getZoom());
-
-        buatDaftarWilayah();
-        updateRingkasan();
-      })
-      .catch(function(error) {
-        alert("GeoJSON belum terbaca. Pastikan file jabar_kabupaten.geojson berada satu folder dengan index.html.");
-        console.error(error);
-      });
+    buatDaftarWilayah();
+    updateRingkasan();
+  })
+  .catch(function(error) {
+    alert("GeoJSON belum terbaca. Pastikan file jabar_kabupaten.geojson berada satu folder dengan index.html.");
+    console.error(error);
+  });
   </script>
 </body>
 </html>
