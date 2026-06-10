@@ -695,11 +695,16 @@ function bukaPopupWilayah(layer) {
   var key = kunciWilayah(namaWilayah);
   var jumlahPenduduk = dataPendudukKey[key] || 0;
 
-  // Hasil contoh:
-  // Kabupaten Sumedang -> kabupaten/sumedang.html
-  // Kota Bandung -> kabupaten/bandung.html
   var slugWilayah = buatSlugWilayah(namaWilayah);
   var fileHTML = "kabupaten/" + slugWilayah + ".html";
+
+  map.flyToBounds(layer.getBounds(), {
+    padding: [40, 40],
+    maxZoom: 11,
+    duration: 0.8
+  });
+
+  layer.unbindPopup();
 
   layer.bindPopup(
     "<div class='popup-box'>" +
@@ -712,7 +717,6 @@ function bukaPopupWilayah(layer) {
     "</div>"
   ).openPopup();
 }
-
     function klikWilayah(e) {
       if (document.activeElement) {
         document.activeElement.blur();
