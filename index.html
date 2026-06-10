@@ -698,11 +698,11 @@ function bukaPopupWilayah(layer) {
   var slugWilayah = buatSlugWilayah(namaWilayah);
   var fileHTML = "kabupaten/" + slugWilayah + ".html";
 
-  map.flyToBounds(layer.getBounds(), {
-    padding: [40, 40],
-    maxZoom: 11,
-    duration: 0.8
-  });
+  map.fitBounds(layer.getBounds(), {
+  padding: [40, 40],
+  maxZoom: 11,
+  animate: false
+});
 
   layer.unbindPopup();
 
