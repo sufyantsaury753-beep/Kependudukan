@@ -7,7 +7,6 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
-  
   <style>
     * {
       box-sizing: border-box;
@@ -509,18 +508,18 @@
     }
 
     function styleWilayah(feature) {
-  var namaWilayah = ambilNamaWilayah(feature);
-  var jumlahPenduduk = dataPenduduk[namaWilayah] || 0;
+      var namaWilayah = ambilNamaWilayah(feature);
+      var jumlahPenduduk = dataPenduduk[namaWilayah] || 0;
 
-  return {
-    fillColor: warnaPenduduk(jumlahPenduduk),
-    weight: 1.3,
-    opacity: 1,
-    color: "#ffffff",
-    fillOpacity: 0.78,
-    dashArray: ""
-  };
-}}
+      return {
+  fillColor: warnaPenduduk(jumlahPenduduk),
+  weight: 1.3,
+  opacity: 1,
+  color: "#000000", // garis pembatas hitam
+  fillOpacity: 0.78,
+  dashArray: ""
+};
+    }
 
     var popupActiveLayer = null;
 
